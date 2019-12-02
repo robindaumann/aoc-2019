@@ -2,6 +2,8 @@
 
 Solutions for 2019
 
+![github actions badge](https://github.com/robindaumann/aoc-2019/workflows/Elixir%20CI/badge.svg)
+
 ## Structure
 
 * `lib/` contains the project source code
