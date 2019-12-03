@@ -1,4 +1,4 @@
-defmodule Day07Test do
+defmodule Day01Test do
   use ExUnit.Case
   require Input
 
