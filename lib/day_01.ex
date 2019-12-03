@@ -1,11 +1,7 @@
 defmodule Day01 do
-  def part1(path) do
-    solve(path, &fuel/1)
-  end
+  def part1(path), do: solve(path, &fuel/1)
 
-  def part2(path) do
-    solve(path, &fuel_rec/1)
-  end
+  def part2(path), do: solve(path, &fuel_rec/1)
 
   defp solve(path, f) do
     path
@@ -17,9 +13,7 @@ defmodule Day01 do
   end
 
   @spec fuel(integer) :: integer
-  def fuel(mass) do
-    div(mass, 3) - 2
-  end
+  def fuel(mass), do: div(mass, 3) - 2
 
   @spec fuel_rec(integer) :: integer
   def fuel_rec(mass) when div(mass, 3) - 2 > 0 do
@@ -27,7 +21,5 @@ defmodule Day01 do
     fuel + fuel_rec(fuel)
   end
 
-  def fuel_rec(_) do
-    0
-  end
+  def fuel_rec(_), do: 0
 end
