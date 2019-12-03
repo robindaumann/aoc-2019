@@ -6,8 +6,8 @@ defmodule Day01 do
   defp solve(path, f) do
     path
     |> File.stream!
-    |> Enum.map(&Integer.parse/1)
-    |> Enum.map(&elem(&1, 0))
+    |> Enum.map(&String.trim/1)
+    |> Enum.map(&String.to_integer/1)
     |> Enum.map(f)
     |> Enum.sum
   end

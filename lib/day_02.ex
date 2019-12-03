@@ -18,9 +18,9 @@ defmodule Day02 do
   defp read(path) do
     path
     |> File.read!
+    |> String.trim
     |> String.split(",")
-    |> Enum.map(&Integer.parse/1)
-    |> Enum.map(&elem(&1, 0))
+    |> Enum.map(&String.to_integer/1)
   end
 
   defp solve(memory, r1, r2) do
