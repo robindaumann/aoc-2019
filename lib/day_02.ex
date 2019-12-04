@@ -28,7 +28,7 @@ defmodule Day02 do
     |> List.replace_at(1, r1)
     |> List.replace_at(2, r2)
     |> step(0)
-    |> Enum.at(0)
+    |> hd
   end
 
   def step(list, index) do
