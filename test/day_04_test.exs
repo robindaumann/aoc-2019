@@ -18,7 +18,7 @@ defmodule Day04Test do
   end
 
   test "pw criteria? bad" do
-    assert Day04.pw_criteria?("123443") == false
+    refute Day04.pw_criteria?("123443")
   end
 
   test "repitition?" do
@@ -30,19 +30,19 @@ defmodule Day04Test do
   end
 
   test "repitition? no double" do
-    assert Day04.repitition?("123456789") == false
+    refute Day04.repitition?("123456789")
   end
 
   test "repitition? empty" do
-    assert Day04.repitition?("") == false
+    refute Day04.repitition?("")
   end
 
   test "repitition? one" do
-    assert Day04.repitition?("1") == false
+    refute Day04.repitition?("1")
   end
 
   test "repitition? middle tripple" do
-    assert Day04.repitition?("12345666789") == true
+    assert Day04.repitition?("12345666789")
   end
 
   test "increases empty" do
@@ -58,11 +58,11 @@ defmodule Day04Test do
   end
 
   test "decreases" do
-    assert Day04.increases?("987") == false
+    refute Day04.increases?("987")
   end
 
   test "decrease after increase" do
-    assert Day04.increases?("1234501") == false
+    refute Day04.increases?("1234501")
   end
 
   test "double?" do
@@ -70,7 +70,7 @@ defmodule Day04Test do
   end
 
   test "double? tripple" do
-    assert Day04.double?("123444", 0, 0) == false
+    refute Day04.double?("123444", 0, 0)
   end
 
   test "double? multiple" do
@@ -82,6 +82,6 @@ defmodule Day04Test do
   end
 
   test "double? empty" do
-    assert Day04.double?("", 0, 0) == false
+    refute Day04.double?("", 0, 0)
   end
 end
