@@ -18,42 +18,13 @@ defmodule Day02 do
   defp read(path) do
     path
     |> File.read!
-    |> String.trim
-    |> String.split(",")
-    |> Enum.map(&String.to_integer/1)
+    |> Intcode.read
   end
 
   defp solve(memory, r1, r2) do
     memory
     |> List.replace_at(1, r1)
     |> List.replace_at(2, r2)
-    |> step(0)
-    |> hd
-  end
-
-  def step(list, index) do
-    slice = Enum.slice(list, index..index+3)
-    case decode(slice, list) do
-      {:cont, list} -> step(list, index+4)
-      {:halt, list} -> list
-    end
-  end
-
-  def decode([1, s1, s2, d], list) do
-    execute(list, &+/2, s1, s2, d)
-  end
-
-  def decode([2, s1, s2, d], list) do
-    execute(list, &*/2, s1, s2, d)
-  end
-
-  def decode([99 | _], list) do
-    {:halt, list}
-  end
-
-  defp execute(list, f, s1, s2, d) do
-    res = f.(Enum.at(list, s1), Enum.at(list, s2))
-    list = List.replace_at(list, d, res)
-    {:cont, list}
+    |> Intcode.run
   end
 end
