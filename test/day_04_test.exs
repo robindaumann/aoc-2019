@@ -1,5 +1,5 @@
 defmodule Day04Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "input part1" do
     assert Day04.part1("183564-657474") == 1610

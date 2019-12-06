@@ -1,5 +1,5 @@
 defmodule Day02Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   require Input
 
   test "part1 input" do

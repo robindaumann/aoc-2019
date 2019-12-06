@@ -1,5 +1,5 @@
 defmodule Day03Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   require Input
 
   @example1 ["R8,U5,L5,D3", "U7,R6,D4,L4"]
