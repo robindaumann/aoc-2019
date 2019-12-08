@@ -19,23 +19,9 @@ defmodule Intcode do
     end
   end
 
-  def execute(list, index) do
+  def execute(mem, []) do
     slice = Enum.slice(list, index)
-    decode(slice, list)
-  end
-
-  def decode([99 | _], mem) do
-    {:halt, mem}
-  end
-
-  def decode([instr | list], mem) do
-    instr = decode_instr(instr)
-    len = Keyword.fetch!(instr, :length)
-
-    parms = Enum.slice(list, 0..len-1)
-
-    res = [ {:parms, parms} | instr ]
-    {:cont, res }
+    decode(slice)
   end
 
   defp _execute(list, f, s1, s2, d) do
@@ -44,26 +30,34 @@ defmodule Intcode do
     {:cont, list}
   end
 
-  def decode_instr(instr) do
-    res = case rem(instr, 100) do
-      1 -> [operation: &+/2, length: 4]
-      2 -> [operation: &*/2, length: 4]
-      3 -> [operation: &IO.read/2, length: 2]
-      4 -> [operation: &IO.write/2, length: 2]
-    end
-
-    modes = decode_modes(instr, Keyword.fetch!(res, :length))
-
-    [ {:modes, modes} | res ]
+  def decode([99 | _]) do
+    [operation: :halt]
   end
 
-  def decode_modes(instr, length) do
-    for i <- 2..length, do: rem(div(instr, pow(10, i)),10)
+  def decode([op_code | list]) do
+    op = decode_op(op_code)
+    len = op[:length]
+
+    parms = Enum.slice(list, 0..len-1)
+    modes = decode_modes(op_code, len)
+
+    [{:parms, parms} | [{:modes, modes} | op]]
+  end
+
+  defp decode_op(op_code) do
+    case rem(op_code, 100) do
+      1 -> %{operation: :add, length: 4}
+      2 -> %{operation: :mult, length: 4}
+      3 -> %{operation: :read, length: 2}
+      4 -> %{operation: :write, length: 2}
+    end
+  end
+
+  defp decode_modes(op_code, length) do
+    for i <- 2..length, do: rem(div(op_code, pow(10, i)),10)
   end
 
   defp pow(base, exp) do
     :math.pow(base, exp) |> round
   end
-
-
 end

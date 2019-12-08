@@ -1,23 +1,27 @@
 defmodule IntcodeTestNew do
   use ExUnit.Case
 
-  test "decode_instr" do
-    assert Intcode.decode_instr(2) == [modes: [0, 0, 0], operation: &*/2, length: 4]
+  test "decode" do
+    parms = [1,2,3]
+    assert Intcode.decode([2 | parms]) == %{parms: parms, modes: [0,0,0], operation: :mult, length: 4}
   end
 
-  test "decode_instr mode" do
-    assert Intcode.decode_instr(102) == [modes: [1, 0, 0], operation: &*/2, length: 4]
+  test "decode mode" do
+    parms = [9,8,12]
+    assert Intcode.decode([102 | parms]) == %{parms: parms, modes: [1,0,0], operation: :mult, length: 4}
   end
 
-  test "decode_instr modes" do
-    assert Intcode.decode_instr(1002) == [modes: [0, 1, 0], operation: &*/2, length: 4]
+  test "decode modes" do
+    parms = [3,3,3]
+    assert Intcode.decode([1102 | parms]) == %{parms: parms, modes: [1,1,0], operation: :mult, length: 4}
   end
 
-  test "decode_instr add modes" do
-    assert Intcode.decode_instr(1001) == [modes: [0, 1, 0], operation: &+/2, length: 4]
+  test "decode add mode" do
+    parms = [0,0,0]
+    assert Intcode.decode([10001 | parms]) == %{parms: parms, modes: [0, 0, 1], operation: :add, length: 4}
   end
 
-  test "decode_instr ouput" do
-    assert Intcode.decode_instr(3) == [modes: [0], operation: &IO.read/2, length: 2]
+  test "decode input" do
+    assert Intcode.decode([3, 1]) == %{parms: [1], modes: [0], operation: :read, length: 2}
   end
 end
