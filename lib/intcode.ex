@@ -7,41 +7,80 @@ defmodule Intcode do
     |> Enum.map(&String.to_integer/1)
   end
 
-  @spec run([integer]) :: integer
-  def run(list) do
-    step(list, 0) |> hd
+  def run(mem, dev \\ :none) do
+    step(mem, 0, dev) |> hd
   end
 
-  def step(list, index) do
-    case execute(list, index) do
-      {:cont, list, len} -> step(list, index+len)
-      {:halt, list} -> list
+  def step(mem, index, dev \\ :none) do
+    instr = Enum.slice(mem, index..index+3) |> decode
+    case exe(instr, mem, dev) do
+      {:cont, mem, len} -> step(mem, index+len, dev)
+      {:halt, mem, _} -> mem
     end
   end
 
-  def execute(mem, []) do
-    slice = Enum.slice(list, index)
-    decode(slice)
+  def exe(%{operation: :add} = instr, mem, _) do
+    modes = set_last_one(instr.modes)
+    [s1, s2, d] = Enum.zip(instr.params, modes) |> load_params(mem)
+
+    mem = List.replace_at(mem, d, s1+s2)
+    {:cont, mem, instr.length}
   end
 
-  defp _execute(list, f, s1, s2, d) do
-    res = f.(Enum.at(list, s1), Enum.at(list, s2))
-    list = List.replace_at(list, d, res)
-    {:cont, list}
+  def exe(%{operation: :mult} = instr, mem, _) do
+    modes = set_last_one(instr.modes)
+    [s1, s2, d] = Enum.zip(instr.params, modes) |> load_params(mem)
+
+    mem = List.replace_at(mem, d, s1*s2)
+    {:cont, mem, instr.length}
   end
+
+  def exe(%{operation: :read} = instr, mem, dev) do
+    modes = set_last_one(instr.modes)
+    [d] = Enum.zip(instr.params, modes) |> load_params(mem)
+    {val, _} = IO.read(dev, :line) |> Integer.parse()
+
+    mem = List.replace_at(mem, d, val)
+    {:cont, mem, instr.length}
+  end
+
+  def exe(%{operation: :write} = instr, mem, dev) do
+    [val] = Enum.zip(instr.params, instr.modes) |> load_params(mem)
+
+    IO.puts(dev, val)
+    {:cont, mem, instr.length}
+  end
+
+  def exe(%{operation: :halt}, mem, _) do
+    {:halt, mem, 1}
+  end
+
+  def set_last_one(modes) do
+    # we set the destination parameter to one because it should not be loaded from memory
+    List.replace_at(modes, -1, 1)
+  end
+
+  def load_params(params, mem) do
+    Enum.map(params, &load_param(&1, mem))
+  end
+
+  defp load_param({index, 0}, mem), do: Enum.at(mem, index)
+  defp load_param({literal, 1}, _), do: literal
 
   def decode([99 | _]) do
-    [operation: :halt]
+    %{operation: :halt}
   end
 
   def decode([op_code | list]) do
     op = decode_op(op_code)
-    len = op[:length]
+    len = op.length
 
-    parms = Enum.slice(list, 0..len-1)
+    params = Enum.slice(list, 0..len-1)
     modes = decode_modes(op_code, len)
 
-    [{:parms, parms} | [{:modes, modes} | op]]
+    op
+    |> Map.put(:params, params)
+    |> Map.put(:modes, modes)
   end
 
   defp decode_op(op_code) do

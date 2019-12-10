@@ -1,23 +1,37 @@
 defmodule IntcodeTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "read" do
     assert Intcode.read("1,2,3,4") == [1,2,3,4]
   end
 
-  test "decode add" do
-    list = [1,0,0,0]
-    assert Intcode.decode(list, list) == {:cont, [2,0,0,0]}
+  test "decode" do
+    params = [1,2,3]
+    assert Intcode.decode([2 | params]) == %{params: params, modes: [0,0,0], operation: :mult, length: 4}
   end
 
-  test "decode multiply" do
-    list = [2,0,0,0]
-    assert Intcode.decode(list, list) == {:cont, [4,0,0,0]}
+  test "decode mode" do
+    params = [9,8,12]
+    assert Intcode.decode([102 | params]) == %{params: params, modes: [1,0,0], operation: :mult, length: 4}
   end
 
-  test "decode halt" do
-    list = [99,0,0,0]
-    assert Intcode.decode(list, list) == {:halt, [99,0,0,0]}
+  test "decode modes" do
+    params = [3,3,3]
+    assert Intcode.decode([1102 | params]) == %{params: params, modes: [1,1,0], operation: :mult, length: 4}
+  end
+
+  test "decode add mode" do
+    params = [0,0,0]
+    assert Intcode.decode([10001 | params]) == %{params: params, modes: [0, 0, 1], operation: :add, length: 4}
+  end
+
+  test "decode input" do
+    assert Intcode.decode([3, 1]) == %{params: [1], modes: [0], operation: :read, length: 2}
+  end
+
+  test "load params" do
+    params = [{7,1}, {0,0}]
+    assert Intcode.load_params(params, [99]) == [7, 99]
   end
 
   test "example 1" do
