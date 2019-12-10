@@ -7,10 +7,12 @@ defmodule Intcode do
     |> Enum.map(&String.to_integer/1)
   end
 
+  @spec run([integer], IO.device) :: integer
   def run(mem, dev \\ :none) do
     step(mem, 0, dev) |> hd
   end
 
+  @spec step([integer], integer, IO.device) :: any
   def step(mem, index, dev \\ :none) do
     instr = Enum.slice(mem, index..index+3) |> decode
     case exe(instr, mem, dev) do
@@ -19,7 +21,8 @@ defmodule Intcode do
     end
   end
 
-  def exe(%{operation: :add} = instr, mem, _) do
+  # execute function is tested via step
+  defp exe(%{operation: :add} = instr, mem, _) do
     modes = set_last_one(instr.modes)
     [s1, s2, d] = Enum.zip(instr.params, modes) |> load_params(mem)
 
@@ -27,7 +30,7 @@ defmodule Intcode do
     {:cont, mem, instr.length}
   end
 
-  def exe(%{operation: :mult} = instr, mem, _) do
+  defp exe(%{operation: :mult} = instr, mem, _) do
     modes = set_last_one(instr.modes)
     [s1, s2, d] = Enum.zip(instr.params, modes) |> load_params(mem)
 
@@ -35,7 +38,7 @@ defmodule Intcode do
     {:cont, mem, instr.length}
   end
 
-  def exe(%{operation: :read} = instr, mem, dev) do
+  defp exe(%{operation: :read} = instr, mem, dev) do
     modes = set_last_one(instr.modes)
     [d] = Enum.zip(instr.params, modes) |> load_params(mem)
     {val, _} = IO.read(dev, :line) |> Integer.parse()
@@ -44,18 +47,18 @@ defmodule Intcode do
     {:cont, mem, instr.length}
   end
 
-  def exe(%{operation: :write} = instr, mem, dev) do
+  defp exe(%{operation: :write} = instr, mem, dev) do
     [val] = Enum.zip(instr.params, instr.modes) |> load_params(mem)
 
     IO.puts(dev, val)
     {:cont, mem, instr.length}
   end
 
-  def exe(%{operation: :halt}, mem, _) do
+  defp exe(%{operation: :halt}, mem, _) do
     {:halt, mem, 1}
   end
 
-  def set_last_one(modes) do
+  defp set_last_one(modes) do
     # we set the destination parameter to one because it should not be loaded from memory
     List.replace_at(modes, -1, 1)
   end
