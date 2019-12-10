@@ -29,6 +29,22 @@ defmodule IntcodeTest do
     assert Intcode.decode([3, 1]) == %{params: [1], modes: [0], operation: :read, length: 2}
   end
 
+  test "decode jump true" do
+    assert Intcode.decode([5, 1, 9]) == %{params: [1,9], modes: [0,0], operation: :jump_true, length: 3}
+  end
+
+  test "decode jump false" do
+    assert Intcode.decode([106, -3, 5]) == %{params: [-3,5], modes: [1,0], operation: :jump_false, length: 3}
+  end
+
+  test "decode lt" do
+    assert Intcode.decode([1107, -7, -5, 1]) == %{params: [-7,-5,1], modes: [1,1,0], operation: :lt, length: 4}
+  end
+
+  test "decode equals" do
+    assert Intcode.decode([8, 11, 11, 11]) == %{params: [11,11,11], modes: [0,0,0], operation: :equals, length: 4}
+  end
+
   test "load params" do
     params = [{7,1}, {0,0}]
     assert Intcode.load_params(params, [99]) == [7, 99]

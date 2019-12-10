@@ -14,9 +14,13 @@ defmodule Intcode do
 
   @spec step([integer], integer, IO.device) :: any
   def step(mem, index, dev \\ :none) do
-    instr = Enum.slice(mem, index..index+3) |> decode
+    instr =
+    Enum.slice(mem, index..index+3)
+    |> decode
+    |> Map.put(:index, index)
+
     case exe(instr, mem, dev) do
-      {:cont, mem, len} -> step(mem, index+len, dev)
+      {:cont, mem, index} -> step(mem, index, dev)
       {:halt, mem, _} -> mem
     end
   end
@@ -27,7 +31,7 @@ defmodule Intcode do
     [s1, s2, d] = Enum.zip(instr.params, modes) |> load_params(mem)
 
     mem = List.replace_at(mem, d, s1+s2)
-    {:cont, mem, instr.length}
+    {:cont, mem, index(instr)}
   end
 
   defp exe(%{operation: :mult} = instr, mem, _) do
@@ -35,7 +39,7 @@ defmodule Intcode do
     [s1, s2, d] = Enum.zip(instr.params, modes) |> load_params(mem)
 
     mem = List.replace_at(mem, d, s1*s2)
-    {:cont, mem, instr.length}
+    {:cont, mem, index(instr)}
   end
 
   defp exe(%{operation: :read} = instr, mem, dev) do
@@ -44,23 +48,27 @@ defmodule Intcode do
     {val, _} = IO.read(dev, :line) |> Integer.parse()
 
     mem = List.replace_at(mem, d, val)
-    {:cont, mem, instr.length}
+    {:cont, mem, index(instr)}
   end
 
   defp exe(%{operation: :write} = instr, mem, dev) do
     [val] = Enum.zip(instr.params, instr.modes) |> load_params(mem)
 
     IO.puts(dev, val)
-    {:cont, mem, instr.length}
+    {:cont, mem, index(instr)}
   end
 
-  defp exe(%{operation: :halt}, mem, _) do
-    {:halt, mem, 1}
+  defp exe(%{operation: :halt, index: index}, mem, _) do
+    {:halt, mem, index}
   end
 
   defp set_last_one(modes) do
     # we set the destination parameter to one because it should not be loaded from memory
     List.replace_at(modes, -1, 1)
+  end
+
+  defp index(%{index: index, length: length}) do
+    index + length
   end
 
   def load_params(params, mem) do
@@ -92,6 +100,10 @@ defmodule Intcode do
       2 -> %{operation: :mult, length: 4}
       3 -> %{operation: :read, length: 2}
       4 -> %{operation: :write, length: 2}
+      5 -> %{operation: :jump_true, length: 3}
+      6 -> %{operation: :jump_false, length: 3}
+      7 -> %{operation: :lt, length: 4}
+      8 -> %{operation: :equals, length: 4}
     end
   end
 
