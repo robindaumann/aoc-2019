@@ -58,6 +58,40 @@ defmodule Intcode do
     {:cont, mem, index(instr)}
   end
 
+  defp exe(%{operation: :jump_true} = instr, mem, _) do
+    [condi, target] = Enum.zip(instr.params, instr.modes) |> load_params(mem)
+
+    index = if condi != 0, do: target, else: index(instr)
+    {:cont, mem, index}
+  end
+
+  defp exe(%{operation: :jump_false} = instr, mem, _) do
+    [condi, target] = Enum.zip(instr.params, instr.modes) |> load_params(mem)
+
+    index = if condi == 0, do: target, else: index(instr)
+    {:cont, mem, index}
+  end
+
+  defp exe(%{operation: :lt} = instr, mem, _) do
+    modes = set_last_one(instr.modes)
+    [s1, s2, d] = Enum.zip(instr.params, modes) |> load_params(mem)
+
+    val = if s1 < s2, do: 1, else: 0
+
+    mem = List.replace_at(mem, d, val)
+    {:cont, mem, index(instr)}
+  end
+
+  defp exe(%{operation: :equals} = instr, mem, _) do
+    modes = set_last_one(instr.modes)
+    [s1, s2, d] = Enum.zip(instr.params, modes) |> load_params(mem)
+
+    val = if s1 == s2, do: 1, else: 0
+
+    mem = List.replace_at(mem, d, val)
+    {:cont, mem, index(instr)}
+  end
+
   defp exe(%{operation: :halt, index: index}, mem, _) do
     {:halt, mem, index}
   end

@@ -8,6 +8,15 @@ defmodule Day05 do
     device
   end
 
+  def part2(path) do
+    {:ok, device} = StringIO.open("5")
+    path
+    |> read()
+    |> Intcode.run(device)
+
+    device
+  end
+
   defp read(path) do
     path
     |> File.read!
