@@ -1,11 +1,16 @@
 defmodule Day07 do
   def part1(path) do
     read(path)
-    |> max_phases
+    |> max_phases(0..4)
   end
 
-  def max_phases(prog) do
-    0..4
+  def part2(path) do
+    read(path)
+    |> max_phases(5..9)
+  end
+
+  def max_phases(prog, range) do
+    range
     |> Enum.to_list
     |> permutations
     |> Enum.map(&run_pipe(prog, &1))
@@ -13,18 +18,24 @@ defmodule Day07 do
   end
 
   def run_pipe(prog, phases) do
-    phases
+    val = phases
     |> Enum.reverse
     |> Enum.reduce(self(), fn phase, pid -> run(prog, phase, pid) end)
-    |> send(0)
+    |> await_loop(0)
 
+    {phases, val}
+  end
+
+  def await_loop(pid, val) do
+    send(pid, val)
     receive do
-      val -> {phases, val}
+      :halt -> val
+      val -> await_loop(pid, val)
     end
   end
 
   def run(prog, phase, target_pid) do
-    dev = create_dev(target_pid)
+    dev = create_io(target_pid)
     pid = spawn Intcode, :run, [prog, dev]
 
     send pid, phase
@@ -32,11 +43,11 @@ defmodule Day07 do
     pid
   end
 
-  def create_dev(target_pid) do
+  def create_io(target_pid) do
     read = fn -> receive do x -> x end end
     write = fn val -> send(target_pid, val) end
 
-    %{read: read, write: write, pid: target_pid}
+    %{read: read, write: write, term: write}
   end
 
   def read(path) do

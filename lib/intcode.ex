@@ -90,7 +90,11 @@ defmodule Intcode do
     {:cont, mem, index(instr)}
   end
 
-  defp exe(%{operation: :halt, index: index}, mem, _) do
+  defp exe(%{operation: :halt, index: index}, mem, dev) do
+    if Map.has_key?(dev, :term) do
+      dev.term.(:halt)
+    end
+
     {:halt, mem, index}
   end
 
