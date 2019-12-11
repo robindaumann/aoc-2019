@@ -69,11 +69,11 @@ defmodule Day05Test do
   end
 
   def compare_io(input, expect, mem) do
-    {:ok, dev} = StringIO.open(input)
+    dev = Day05.create_dev(input)
 
     Intcode.step(mem, 0, dev)
 
-    [output] = get_output(dev)
+    [output] = get_output(dev.pid)
 
     assert output == expect
   end

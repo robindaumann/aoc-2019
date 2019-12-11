@@ -13,19 +13,30 @@ defmodule Day07 do
   end
 
   def run_pipe(prog, phases) do
-    signal = Enum.reduce(phases, 0, fn phase, signal -> run(prog, phase, signal) end)
-    {phases, signal}
+    phases
+    |> Enum.reverse
+    |> Enum.reduce(self(), fn phase, pid -> run(prog, phase, pid) end)
+    |> send(0)
+
+    receive do
+      val -> {phases, val}
+    end
   end
 
-  def run(prog, phase, signal) do
-    {:ok, dev} = [phase, signal]
-    |> Enum.join("\n")
-    |> StringIO.open
+  def run(prog, phase, target_pid) do
+    dev = create_dev(target_pid)
+    pid = spawn Intcode, :run, [prog, dev]
 
-    Intcode.run(prog, dev)
+    send pid, phase
 
-    {:ok, {"", out}} = StringIO.close(dev)
-    out |> String.trim |> String.to_integer
+    pid
+  end
+
+  def create_dev(target_pid) do
+    read = fn -> receive do x -> x end end
+    write = fn val -> send(target_pid, val) end
+
+    %{read: read, write: write, pid: target_pid}
   end
 
   def read(path) do

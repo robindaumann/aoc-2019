@@ -7,13 +7,11 @@ defmodule Intcode do
     |> Enum.map(&String.to_integer/1)
   end
 
-  @spec run([integer], IO.device) :: integer
-  def run(mem, dev \\ :none) do
+  def run(mem, dev \\ %{}) do
     step(mem, 0, dev) |> hd
   end
 
-  @spec step([integer], integer, IO.device) :: any
-  def step(mem, index, dev \\ :none) do
+  def step(mem, index, dev \\ %{}) do
     instr =
     Enum.slice(mem, index..index+3)
     |> decode
@@ -45,7 +43,7 @@ defmodule Intcode do
   defp exe(%{operation: :read} = instr, mem, dev) do
     modes = set_last_one(instr.modes)
     [d] = Enum.zip(instr.params, modes) |> load_params(mem)
-    {val, _} = IO.read(dev, :line) |> Integer.parse()
+    val = dev.read.()
 
     mem = List.replace_at(mem, d, val)
     {:cont, mem, index(instr)}
@@ -54,7 +52,7 @@ defmodule Intcode do
   defp exe(%{operation: :write} = instr, mem, dev) do
     [val] = Enum.zip(instr.params, instr.modes) |> load_params(mem)
 
-    IO.puts(dev, val)
+    dev.write.(val)
     {:cont, mem, index(instr)}
   end
 
