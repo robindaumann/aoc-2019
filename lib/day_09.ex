@@ -5,6 +5,10 @@ defmodule Day09 do
     File.read!(path) |> Intcode.read |> run("1")
   end
 
+  def part2(path) do
+    File.read!(path) |> Intcode.read |> run("2")
+  end
+
   def run(prog, input \\ "") do
     dev = Shared.create_dev(input)
     Intcode.run(prog, dev)

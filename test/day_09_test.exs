@@ -7,6 +7,11 @@ defmodule Day09Test do
     assert Day09.part1(path) == [2745604242]
   end
 
+  test "part2" do
+    path = Input.path()
+    assert Day09.part2(path) == [51135]
+  end
+
   test "example1" do
     prog = [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
 
