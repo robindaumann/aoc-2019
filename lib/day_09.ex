@@ -2,11 +2,11 @@ defmodule Day09 do
   alias Intcode.Shared
 
   def part1(path) do
-    File.read!(path) |> Intcode.read |> run("1")
+    Intcode.read_path(path) |> run("1")
   end
 
   def part2(path) do
-    File.read!(path) |> Intcode.read |> run("2")
+    Intcode.read_path(path) |> run("2")
   end
 
   def run(prog, input \\ "") do

@@ -1,6 +1,11 @@
 defmodule Intcode do
   alias Intcode.{Decoder, Engine, Shared}
 
+  @spec read_path(Path.t) :: [integer]
+  def read_path(path) do
+    File.read!(path) |> read
+  end
+
   @spec read(binary) :: [integer]
   def read(s) do
     s

@@ -4,7 +4,7 @@ defmodule Day05 do
   def part1(path) do
     device = Shared.create_dev("1")
     path
-    |> read()
+    |> Intcode.read_path()
     |> Intcode.run(device)
 
     device.pid
@@ -13,15 +13,9 @@ defmodule Day05 do
   def part2(path) do
     device = Shared.create_dev("5")
     path
-    |> read()
+    |> Intcode.read_path()
     |> Intcode.run(device)
 
     device.pid
-  end
-
-  defp read(path) do
-    path
-    |> File.read!
-    |> Intcode.read
   end
 end

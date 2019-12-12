@@ -1,12 +1,12 @@
 defmodule Day07 do
   alias Intcode.Shared
   def part1(path) do
-    read(path)
+    Intcode.read_path(path)
     |> max_phases(0..4)
   end
 
   def part2(path) do
-    read(path)
+    Intcode.read_path(path)
     |> max_phases(5..9)
   end
 
@@ -42,12 +42,6 @@ defmodule Day07 do
     send pid, phase
 
     pid
-  end
-
-  def read(path) do
-    path
-    |> File.read!
-    |> Intcode.read
   end
 
   defp permutations([]), do: [[]]
