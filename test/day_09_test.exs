@@ -4,7 +4,7 @@ defmodule Day09Test do
 
   test "part1" do
     path = Input.path()
-    Day09.part1(path)
+    assert Day09.part1(path) == [2745604242]
   end
 
   test "example1" do
