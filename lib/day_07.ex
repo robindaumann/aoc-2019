@@ -1,4 +1,5 @@
 defmodule Day07 do
+  alias Intcode.Shared
   def part1(path) do
     read(path)
     |> max_phases(0..4)
@@ -35,19 +36,12 @@ defmodule Day07 do
   end
 
   def run(prog, phase, target_pid) do
-    dev = create_io(target_pid)
+    dev = Shared.create_io(target_pid)
     pid = spawn Intcode, :run, [prog, dev]
 
     send pid, phase
 
     pid
-  end
-
-  def create_io(target_pid) do
-    read = fn -> receive do x -> x end end
-    write = fn val -> send(target_pid, val) end
-
-    %{read: read, write: write, term: write}
   end
 
   def read(path) do
@@ -56,9 +50,8 @@ defmodule Day07 do
     |> Intcode.read
   end
 
-  def permutations([]), do: [[]]
-
-  def permutations(list) do
+  defp permutations([]), do: [[]]
+  defp permutations(list) do
     for elem <- list, rest <- permutations(list--[elem]), do: [elem|rest]
   end
 end

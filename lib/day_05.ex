@@ -1,6 +1,8 @@
 defmodule Day05 do
+  alias Intcode.Shared
+
   def part1(path) do
-    device = create_dev("1")
+    device = Shared.create_dev("1")
     path
     |> read()
     |> Intcode.run(device)
@@ -9,7 +11,7 @@ defmodule Day05 do
   end
 
   def part2(path) do
-    device = create_dev("5")
+    device = Shared.create_dev("5")
     path
     |> read()
     |> Intcode.run(device)
@@ -21,13 +23,5 @@ defmodule Day05 do
     path
     |> File.read!
     |> Intcode.read
-  end
-
-  def create_dev(content) do
-    {:ok, pid} = StringIO.open(content)
-    read = fn -> IO.read(pid, :line) |> Integer.parse |> elem(0) end
-    write = fn val -> IO.puts(pid, val) end
-
-    %{read: read, write: write, pid: pid}
   end
 end
