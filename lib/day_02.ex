@@ -10,7 +10,7 @@ defmodule Day02 do
     inputs = for i <- 0..99, j <- 0..99, do: {i,j}
 
     inputs
-    |> Enum.map(fn {i, j} -> {solve(mem, i, j), 100*i + j} end)
+    |> Stream.map(fn {i, j} -> {solve(mem, i, j), 100*i + j} end)
     |> Enum.find(fn ({res, _}) -> res == 19690720 end)
     |> elem(1)
   end
