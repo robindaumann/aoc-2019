@@ -32,12 +32,14 @@ defmodule Day07 do
     receive do
       :halt -> val
       val -> await_loop(pid, val)
+    after
+      1000 -> raise RuntimeError
     end
   end
 
   def run(prog, phase, target_pid) do
     dev = Shared.create_io(target_pid)
-    pid = spawn Intcode, :run, [prog, dev]
+    pid = spawn_link(Intcode, :run, [prog, dev])
 
     send pid, phase
 
