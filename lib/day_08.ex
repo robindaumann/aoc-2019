@@ -12,13 +12,16 @@ defmodule Day08 do
     |> Enum.map(&Tuple.to_list/1)
     |> Enum.map(&overlap_all/1)
     |> Enum.chunk_every(width)
+    |> show()
   end
 
   def show(l) do
-    Enum.map_join(l, "\n", &Enum.map_join(&1, "", fn
-      0 -> " "
+    img = Enum.map_join(l, "\n", &Enum.map_join(&1, "", fn
+      0 -> "."
       1 -> "#"
       end))
+
+    Input.show("Day08 image", img <> "\n")
   end
 
   def overlap_all(list) do

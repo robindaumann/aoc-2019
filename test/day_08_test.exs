@@ -15,18 +15,22 @@ defmodule Day08Test do
   test "part2 example" do
     {:ok, dev} = StringIO.open("0222112222120000")
     img = Day08.part2(dev, 2, 2)
-    assert img == [[0, 1], [1, 0]]
+    assert img == """
+    .#
+    #.
+    """
   end
 
   test "part2 input" do
     f = Input.path() |> File.open!
-    img = Day08.part2(f, 25, 6)
-    assert img
-    unless System.get_env("GITHUB_ACTION") do
-      IO.puts("")
-      IO.puts(Day08.show(img))
-      IO.puts("")
-    end
+    assert Day08.part2(f, 25, 6) == """
+    #...##....####.###....##.
+    #...##....#....#..#....#.
+    .#.#.#....###..#..#....#.
+    ..#..#....#....###.....#.
+    ..#..#....#....#....#..#.
+    ..#..####.#....#.....##..
+    """
   end
 
   test "overlap_all 1" do
