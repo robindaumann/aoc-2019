@@ -1,8 +1,6 @@
 # Aoc2019
 
-Solutions for 2019
-
-![github actions badge](https://github.com/robindaumann/aoc-2019/workflows/Elixir%20CI/badge.svg)
+Solutions for [AOC 2019](https://adventofcode.com/2019)
 
 ## Structure
 
